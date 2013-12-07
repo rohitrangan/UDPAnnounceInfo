@@ -1,6 +1,8 @@
 UDPAnnounceInfo
 ===============
 
+Gets announce/scrape information from UDP trackers from a given torrent file.
+
 ##Instructions for use
 1. Run udp\_track\_announce.py in the terminal using the following command
    "python udp\_track\_announce.py -h". This will display the help for the
