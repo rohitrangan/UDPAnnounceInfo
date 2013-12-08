@@ -68,18 +68,23 @@ def announce_udp(parsed_tracker, info_hash):
     conn = (socket.gethostbyname(parsed_tracker.hostname), parsed_tracker.port)
 
     # Get connection ID.
-    req, transaction_id = udp_create_connection_request()
-    sock.sendto(req, conn);
-    buf = sock.recvfrom(2048)[0]
-    connection_id = udp_parse_connection_response(buf, transaction_id)
+    try:
+        req, transaction_id = udp_create_connection_request()
+        sock.sendto(req, conn);
+        buf = sock.recvfrom(2048)[0]
+        connection_id = udp_parse_connection_response(buf, transaction_id)
     
-    # Creating, sending the announce request. We then receive the reply which
-    # we proceed to parse.
-    req, transaction_id = udp_create_announce_request(connection_id,
-                                                      info_hash)
-    sock.sendto(req, conn)
-    buf = sock.recvfrom(2048)[0]
-    return udp_parse_announce_response(buf, transaction_id, info_hash)
+        # Creating, sending the announce request. We then receive the reply
+        # which we proceed to parse.
+        req, transaction_id = udp_create_announce_request(connection_id,
+                                                          info_hash)
+        sock.sendto(req, conn)
+        buf = sock.recvfrom(2048)[0]
+        return udp_parse_announce_response(buf, transaction_id, info_hash)
+    except socket.timeout:
+        print "Connection timeout to ", parsed_tracker.geturl()
+        print "\n"
+        return None
 
 def udp_create_announce_request(connection_id, info_hash):
     # Refer to http://xbtt.sourceforge.net/udp_tracker_protocol.html
@@ -203,17 +208,22 @@ def scrape_udp(parsed_tracker, hashes):
             parsed_tracker.port)
 
     # Get the connection ID.
-    req, transaction_id = udp_create_connection_request()
-    sock.sendto(req, conn);
-    buf = sock.recvfrom(2048)[0]
-    connection_id = udp_parse_connection_response(buf, transaction_id)
+    try:
+        req, transaction_id = udp_create_connection_request()
+        sock.sendto(req, conn);
+        buf = sock.recvfrom(2048)[0]
+        connection_id = udp_parse_connection_response(buf, transaction_id)
 
-    # Creating, sending the scrape request. We then receive the reply which
-    # we proceed to parse.
-    req, transaction_id = udp_create_scrape_request(connection_id, hashes)
-    sock.sendto(req, conn)
-    buf = sock.recvfrom(2048)[0]
-    return udp_parse_scrape_response(buf, transaction_id, hashes)
+        # Creating, sending the scrape request. We then receive the reply
+        # which we proceed to parse.
+        req, transaction_id = udp_create_scrape_request(connection_id, hashes)
+        sock.sendto(req, conn)
+        buf = sock.recvfrom(2048)[0]
+        return udp_parse_scrape_response(buf, transaction_id, hashes)
+    except socket.timeout:
+        print "Connection timeout to ", parsed_tracker.geturl()
+        print "\n"
+        return None
 
 def udp_create_connection_request():
     # Refer to http://xbtt.sourceforge.net/udp_tracker_protocol.html
